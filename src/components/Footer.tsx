@@ -214,7 +214,7 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
         <div className="border-t border-primary-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-primary-200 mb-4 md:mb-0">
-              <p className="mb-1">&copy; 2024 Jadi Abdi Negara. All rights reserved.</p>
+              <p className="mb-1">&copy; 2026 Jadi Abdi Negara. All rights reserved.</p>
               <p className="text-sm">PT. INDONESIA BERJAYA INOVATIF</p>
             </div>
             <div className="flex space-x-6 text-sm text-primary-200">
