@@ -277,8 +277,8 @@ const About: React.FC<AboutProps> = ({ onCTAClick }) => {
                 <Phone className="h-6 w-6 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-lg mb-1">WhatsApp</h3>
-                  <a href="https://wa.me/6281199997777" target="_blank" rel="noopener noreferrer" className="text-primary-100 hover:text-white transition-colors">
-                    +62 811-9999-7777
+                  <a href="https://wa.me/6287833641467" target="_blank" rel="noopener noreferrer" className="text-primary-100 hover:text-white transition-colors">
+                    +62 878-3364-1467
                   </a>
                 </div>
               </div>

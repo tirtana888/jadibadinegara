@@ -85,10 +85,10 @@ const HomePage: React.FC = () => {
         handlePageChange('checkout-cpns-offline');
         break;
       case 'whatsapp':
-        window.open('https://wa.me/6281199997777?text=Halo, saya tertarik dengan program tryout CPNS/PPPK', '_blank');
+        window.open('https://wa.me/6287833641467?text=Halo, saya tertarik dengan program tryout CPNS/PPPK', '_blank');
         break;
       case 'phone':
-        window.open('tel:+6281199997777', '_self');
+        window.open('tel:+6287833641467', '_self');
         break;
       case 'email':
         window.open('mailto:info@abdinegara.com?subject=Pertanyaan tentang Program Tryout', '_self');

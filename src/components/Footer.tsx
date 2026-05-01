@@ -167,7 +167,7 @@ const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
                 <Phone className="h-5 w-5 text-secondary-500 mt-1 flex-shrink-0" />
                 <div className="text-primary-200">
                   <p className="font-semibold">Customer Service</p>
-                  <p>+62 811-9999-7777</p>
+                  <p>+62 878-3364-1467</p>
                   <p className="text-sm">24/7 Support</p>
                 </div>
               </div>

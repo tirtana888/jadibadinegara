@@ -101,7 +101,7 @@ KEUNGGULAN:
 - Grup belajar eksklusif
 
 KONTAK:
-- WhatsApp: +62 811-9999-7777 (24/7)
+- WhatsApp: +62 878-3364-1467 (24/7)
 - Email: info@jadiabdinegara.com
 - Head Office: Jl. Arifin No. 89, Surakarta
 
@@ -153,7 +153,7 @@ PENTING: Fokus pada sales conversion dengan pendekatan consultative selling. Pah
       console.error('Error:', error);
       const errorMessage: Message = {
         role: 'assistant',
-        content: 'Maaf, terjadi kesalahan. Silakan hubungi kami langsung di WhatsApp: +62 811-9999-7777 untuk bantuan lebih lanjut.',
+        content: 'Maaf, terjadi kesalahan. Silakan hubungi kami langsung di WhatsApp: +62 878-3364-1467 untuk bantuan lebih lanjut.',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
