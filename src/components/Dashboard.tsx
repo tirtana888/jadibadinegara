@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 import { BookOpen, Trophy, Clock, TrendingUp, LogOut, User as UserIcon, Play, CheckCircle } from 'lucide-react';
 import AIAssistant from './AIAssistant';
 
@@ -26,75 +24,12 @@ interface Attempt {
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
-  const [tryouts, setTryouts] = useState<Tryout[]>([]);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tryouts] = useState<Tryout[]>([]);
+  const [attempts] = useState<Attempt[]>([]);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedTryout, setSelectedTryout] = useState<Tryout | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
-  }, [user]);
-
-  const loadDashboardData = async () => {
-    try {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user?.id)
-        .maybeSingle();
-
-      setProfile(profileData);
-
-      const { data: tryoutsData } = await supabase
-        .from('tryouts')
-        .select('*')
-        .eq('is_active', true)
-        .order('created_at', { ascending: false });
-
-      setTryouts(tryoutsData || []);
-
-      const { data: attemptsData } = await supabase
-        .from('user_tryout_attempts')
-        .select(`
-          id,
-          score,
-          correct_answers,
-          completed_at,
-          tryout_id,
-          tryouts (
-            title,
-            total_questions
-          )
-        `)
-        .eq('user_id', user?.id)
-        .eq('is_completed', true)
-        .order('completed_at', { ascending: false })
-        .limit(5);
-
-      const formattedAttempts = attemptsData?.map((attempt: any) => ({
-        id: attempt.id,
-        score: attempt.score,
-        correct_answers: attempt.correct_answers,
-        total_questions: attempt.tryouts.total_questions,
-        completed_at: attempt.completed_at,
-        tryout_title: attempt.tryouts.title,
-      })) || [];
-
-      setAttempts(formattedAttempts);
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
     navigate('/');
   };
 
@@ -115,16 +50,6 @@ const Dashboard: React.FC = () => {
     navigate('/', { state: { checkout: type, program: programType } });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Memuat dashboard...</p>
-        </div>
-      </div>
-    );
-  }
 
   const totalAttempts = attempts.length;
   const averageScore = attempts.length > 0
@@ -148,7 +73,7 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-slate-700">
                 <UserIcon className="h-5 w-5" />
-                <span className="font-medium hidden sm:inline">{profile?.full_name || 'User'}</span>
+                <span className="font-medium hidden sm:inline">Dashboard</span>
               </div>
               <button
                 onClick={handleLogout}
@@ -165,7 +90,7 @@ const Dashboard: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
-            Selamat Datang, {profile?.full_name || 'User'}!
+            Selamat Datang!
           </h1>
           <p className="text-slate-600">Kelola dan pantau progress tryout Anda di sini</p>
         </div>

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Clock, Flag, ArrowLeft, ArrowRight, CheckCircle, AlertTriangle, Home } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 import AIAssistant from '../components/AIAssistant';
 
 interface Question {
@@ -30,7 +28,6 @@ interface Tryout {
 const TryoutPage: React.FC = () => {
   const { tryoutId } = useParams<{ tryoutId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const [tryout, setTryout] = useState<Tryout | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -38,70 +35,26 @@ const TryoutPage: React.FC = () => {
   const [answers, setAnswers] = useState<{ [key: number]: string }>({});
   const [flaggedQuestions, setFlaggedQuestions] = useState<Set<number>>(new Set());
   const [timeRemaining, setTimeRemaining] = useState(0);
-  const [attemptId, setAttemptId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showResult, setShowResult] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   useEffect(() => {
-    if (tryoutId && user) {
-      loadTryout();
+    if (tryoutId) {
+      // No database - show empty state
+      setLoading(false);
     }
-  }, [tryoutId, user]);
+  }, [tryoutId]);
+
 
   useEffect(() => {
     if (timeRemaining > 0 && !showResult) {
       const timer = setTimeout(() => setTimeRemaining(timeRemaining - 1), 1000);
       return () => clearTimeout(timer);
-    } else if (timeRemaining === 0 && !showResult && attemptId) {
+    } else if (timeRemaining === 0 && !showResult && questions.length > 0) {
       submitTryout();
     }
   }, [timeRemaining, showResult]);
-
-  const loadTryout = async () => {
-    try {
-      const { data: tryoutData, error: tryoutError } = await supabase
-        .from('tryouts')
-        .select('*')
-        .eq('id', tryoutId)
-        .single();
-
-      if (tryoutError) throw tryoutError;
-
-      setTryout(tryoutData);
-      setTimeRemaining(tryoutData.duration_minutes * 60);
-
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('tryout_id', tryoutId)
-        .order('question_number');
-
-      if (questionsError) throw questionsError;
-
-      setQuestions(questionsData);
-
-      const { data: attemptData, error: attemptError } = await supabase
-        .from('user_tryout_attempts')
-        .insert([
-          {
-            user_id: user?.id,
-            tryout_id: tryoutId,
-          },
-        ])
-        .select()
-        .single();
-
-      if (attemptError) throw attemptError;
-
-      setAttemptId(attemptData.id);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error loading tryout:', error);
-      alert('Gagal memuat tryout. Silakan coba lagi.');
-      navigate('/dashboard');
-    }
-  };
 
   const handleAnswerSelect = (answer: string) => {
     setAnswers((prev) => ({
@@ -112,28 +65,8 @@ const TryoutPage: React.FC = () => {
     saveAnswer(answer);
   };
 
-  const saveAnswer = async (answer: string) => {
-    if (!attemptId || !questions[currentQuestion]) return;
-
-    const question = questions[currentQuestion];
-    const isCorrect = answer === question.correct_answer;
-
-    try {
-      const { error } = await supabase.from('user_answers').upsert(
-        {
-          attempt_id: attemptId,
-          question_id: question.id,
-          selected_answer: answer,
-          is_correct: isCorrect,
-          is_flagged: flaggedQuestions.has(currentQuestion),
-        },
-        { onConflict: 'attempt_id,question_id' }
-      );
-
-      if (error) throw error;
-    } catch (error) {
-      console.error('Error saving answer:', error);
-    }
+  const saveAnswer = (_answer: string) => {
+    // No database - answers stored in local state only
   };
 
   const toggleFlag = () => {
@@ -164,48 +97,9 @@ const TryoutPage: React.FC = () => {
     setCurrentQuestion(index);
   };
 
-  const submitTryout = async () => {
-    if (!attemptId) return;
-
-    try {
-      let correctAnswers = 0;
-      let wrongAnswers = 0;
-      let unanswered = 0;
-
-      questions.forEach((question, index) => {
-        const userAnswer = answers[index];
-        if (!userAnswer) {
-          unanswered++;
-        } else if (userAnswer === question.correct_answer) {
-          correctAnswers++;
-        } else {
-          wrongAnswers++;
-        }
-      });
-
-      const score = Math.round((correctAnswers / questions.length) * 100);
-
-      const { error } = await supabase
-        .from('user_tryout_attempts')
-        .update({
-          completed_at: new Date().toISOString(),
-          is_completed: true,
-          score,
-          correct_answers: correctAnswers,
-          wrong_answers: wrongAnswers,
-          unanswered,
-          time_spent_seconds: (tryout!.duration_minutes * 60) - timeRemaining,
-        })
-        .eq('id', attemptId);
-
-      if (error) throw error;
-
-      setShowResult(true);
-      setShowSubmitConfirm(false);
-    } catch (error) {
-      console.error('Error submitting tryout:', error);
-      alert('Gagal menyimpan hasil tryout. Silakan coba lagi.');
-    }
+  const submitTryout = () => {
+    setShowResult(true);
+    setShowSubmitConfirm(false);
   };
 
   const formatTime = (seconds: number) => {
